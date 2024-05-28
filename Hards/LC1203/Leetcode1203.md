@@ -142,9 +142,24 @@ return ans
 ```
 In the case where there are interdependencies on items/groups we return empty lists.
 
+#### Explanation of the graph creation variables because I was a bit confused
+* Loop over all items (i) in the range n: Here, n is the total number of items, and i represents the current item being considered.
+
+* Nested loop over beforeItems[i]: beforeItems[i] is a list of items that must come before item i in the final ordering. prev is one of these prerequisite items.
+
+* Setup item graph: itemGraph[prev].append(i) creates an adjacency list representing the graph of items. It adds an edge from prev to i, indicating that i is dependent on prev. This is the direction the edge points to show dependencies.
+
+* Increment item indegree: itemIn[i] += 1 increments the indegree of item i. Indegree is a count of how many edges point to a node (i in this case). Each time an item i is dependent on another item (prev), its indegree is increased, indicating it has an additional prerequisite.
+
+* Check if items belong to different groups: The conditional if group[i] != group[prev] checks if item i and its prerequisite prev belong to different groups. This is important because dependencies between items in different groups also create dependencies between the groups themselves.
+
+* Setup group graph: If i and prev are in different groups, then groupGraph[group[prev]].append(group[i]) adds an edge in the group graph from the group of prev to the group of i. This shows that the group containing i is dependent on the group containing prev.
+
+* Increment group indegree: groupIn[group[i]] += 1 similarly increments the indegree for the group of i. Each time a dependency is established from one group to another, the indegree of the dependent group is increased, indicating it has additional prerequisites.
+  
 ### Actual Code:
 
-```
+```Python
 class Solution:    
     def sortItems(self, n: int, m: int, group: List[int], beforeItems: List[List[int]]) -> List[int]:
         #so we are given groups, and we have dependencies
